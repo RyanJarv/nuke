@@ -1,0 +1,72 @@
+regions:
+  - us-west-1
+  - us-west-2
+  - us-east-1
+  - us-east-2
+  - global
+
+account-blacklist:
+- "999999999999" # production
+
+
+resource-types:
+  # don't nuke IAM users
+  targets:
+    - Route53HostedZone
+    - Route53HealthCheck
+    - Route53ResourceRecordSet
+    - DynamoDBTable
+    - DynamoDBTableItem
+    - ECSClusterInstance
+    - ECSService
+    - ECSTaskDefinition
+    - EFSFileSystem
+    - EFSMountTarget
+    - EKSCluster
+    - EKSFargateProfiles
+    - EKSNodegroups
+    - ELB
+    - ELBv2
+    - ELBv2TargetGroup
+    - CloudFormationStack
+    - CloudFormationStackSet
+    - CloudFormationType
+    - CloudFrontDistribution
+    - CloudFrontDistributionDeployment
+    - KMSAlias
+    - KMSKey
+    - CloudFormationStack
+    - CloudFormationStackSet
+    - CloudFormationType
+
+
+
+accounts:
+  "353973584341": #jarvnation
+    filters:
+      CloudFormationStack:
+      - property: Name
+        type: glob
+        value: "AWSControlTower*"
+      CloudFormationStackSet:
+      - property: Name
+        type: glob
+        value: "AWSControlTower*"
+  "978893991617": {} #audit
+  "258704079760": {} #data
+  "418769461135": {} #corp
+  "877858628825": {} #prod#
+  "377231773819": {} #staging#
+  "292070218069": {} #testing#
+  "253528964770": #dev#
+    filters:
+      CloudFormationStack:
+      - property: Name
+        type: glob
+        value: "StackSet-AWSControlTower*"
+      - property: tag:copilot-environment
+        value: "jobs"
+      Route53HostedZone:
+      - property: Name
+        type: glob
+        value: "*.local."
