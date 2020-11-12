@@ -1,6 +1,6 @@
-# Setup
+# aws-nuke
 
-* `copilot init`
-  * Use aws-nuke as the app name
-  * Set up a environment when prompted, otherwise run `copilot env init`
-    * Use main as the env name
+* testing
+  * `aws-vault exec rjsh-dev-admin -- make nuke/test`
+* run
+  * `aws-vault exec rjsh-dev-admin -- make nuke/run`
