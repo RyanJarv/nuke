@@ -19,7 +19,6 @@ resource-types:
     - DynamoDBTableItem
     - ECSClusterInstance
     - ECSService
-    - ECSTaskDefinition
     - EFSFileSystem
     - EFSMountTarget
     - EKSCluster
@@ -28,7 +27,6 @@ resource-types:
     - ELB
     - ELBv2
     - ELBv2TargetGroup
-    - CloudFormationStack
     - CloudFormationStackSet
     - CloudFormationType
     - CloudFrontDistribution
@@ -64,8 +62,11 @@ accounts:
       - property: Name
         type: glob
         value: "StackSet-AWSControlTower*"
-      - property: tag:copilot-environment
-        value: "jobs"
+      - property: "tag:copilot-task"
+        value: "awsutils"
+      CloudFormationStackSet:
+      - property: "Name"
+        value: "tasks-infrastructure"
       Route53HostedZone:
       - property: Name
         type: glob
