@@ -11,10 +11,9 @@ ROLE_NAME='ECSTaskFullAccountAdmin'
 account_id="$(aws sts get-caller-identity --query 'Account' --out text)"
 
 create_role() {
-    aws iam create-role \
+    aws --out text iam create-role \
       --role-name "$ROLE_NAME" \
-      --assume-role-policy-document '
-{
+      --assume-role-policy-document '{
   "Version": "2012-10-17",
   "Statement": [
     {
@@ -28,15 +27,15 @@ create_role() {
     }
   ]
 }
-'
+' > /dev/null
     
-    aws iam create-role \
+    aws iam attach-role-policy \
       --role-name "$ROLE_NAME" \
-      --policy-arn "arn:aws:iam::aws:policy/AdministratorAccess"
+      --policy-arn "arn:aws:iam::aws:policy/AdministratorAccess" > /dev/null
 }
 
 
-aws iam get-role --role-name "$ROLE_NAME" > /dev/null || { ret=$?
+aws --out text iam get-role --role-name "$ROLE_NAME" > /dev/null || { ret=$?
   if [[ "$ret" == 254 ]]; then
     create_role
   else

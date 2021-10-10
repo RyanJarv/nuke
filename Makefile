@@ -2,6 +2,7 @@ export TASK_ROLE ?= "ECSTaskFullAccountAdmin"
 export AWS_NUKE_NO_DRYRUN ?= "false"
 
 nuke/setup:
+	aws ecs create-cluster --out text | cat
 	@./aws-nuke/create-admin-role.sh
 	cd aws-nuke; docker build -t aws-nuke .
 

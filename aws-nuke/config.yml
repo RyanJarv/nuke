@@ -11,31 +11,34 @@ account-blacklist:
 
 resource-types:
   # don't nuke IAM users
-  targets:
-    - Route53HostedZone
-    - Route53HealthCheck
-    - Route53ResourceRecordSet
-    - DynamoDBTable
-    - DynamoDBTableItem
-    - ECSClusterInstance
-    - ECSService
-    - EFSFileSystem
-    - EFSMountTarget
-    - EKSCluster
-    - EKSFargateProfiles
-    - EKSNodegroups
-    - ELB
-    - ELBv2
-    - ELBv2TargetGroup
-    - CloudFormationStackSet
-    - CloudFormationType
+  excludes:
+    - S3Object
     - CloudFrontDistribution
-    - CloudFrontDistributionDeployment
-    - KMSAlias
-    - KMSKey
-    - CloudFormationStack
-    - CloudFormationStackSet
-    - CloudFormationType
+#  targets:
+#    - Route53HostedZone
+#    - Route53HealthCheck
+#    - Route53ResourceRecordSet
+#    - DynamoDBTable
+#    - DynamoDBTableItem
+#    - ECSClusterInstance
+#    - ECSService
+#    - EFSFileSystem
+#    - EFSMountTarget
+#    - EKSCluster
+#    - EKSFargateProfiles
+#    - EKSNodegroups
+#    - ELB
+#    - ELBv2
+#    - ELBv2TargetGroup
+#    - CloudFormationStackSet
+#    - CloudFormationType
+#    - CloudFrontDistribution
+#    - CloudFrontDistributionDeployment
+#    - KMSAlias
+#    - KMSKey
+#    - CloudFormationStack
+#    - CloudFormationStackSet
+#    - CloudFormationType
 
 
 
@@ -58,16 +61,120 @@ accounts:
   "292070218069": {} #testing#
   "253528964770": #dev#
     filters:
+      CloudTrailTrail:
+      - "aws-controltower-BaselineCloudTrail"
+      EC2VPC:
+      - property: IsDefault
+        value: "true"
+      EC2InternetGateway:
+      - property: DefaultVPC
+        value: "true"
+      CloudWatchEventsRule:
+      - "aws-controltower-*"
+      AthenaWorkGroup:
+      - "primary"
+      EC2InternetGatewayAttachment:
+      - property: DefaultForAz
+        value: "true"
+      EC2Subnet:
+      - property: DefaultForAz
+        value: "true"
+      EC2RouteTable:
+      - property: DefaultVPC
+        value: "true"
+      CloudWatchLogsLogGroup:
+      - type: glob
+        value: "/aws/lambda/*.cdn-proxy-request"
+      - type: glob
+        value: "/aws/cloudfront/LambdaEdge/*"
+      - "/copilot/nuke"
+      ConfigServiceConfigurationRecorder:
+      - "default"
+      - type: glob
+        value: "aws-controltower-*"
+      SNSSubscription:
+      - type: glob
+        value: "*:aws-controltower-*"
+      LambdaFunction:
+      - "aws-controltower-NotificationForwarder"
+      - type: glob
+        value: "aws-controltower-*"
       CloudFormationStack:
-      - property: Name
-        type: glob
+      - aws-sam-cli-managed-default 
+      - type: glob
         value: "StackSet-AWSControlTower*"
       - property: "tag:copilot-task"
         value: "awsutils"
+      - property: "tag:copilot-task"
+        value: "nuke"
       CloudFormationStackSet:
-      - property: "Name"
-        value: "tasks-infrastructure"
-      Route53HostedZone:
-      - property: Name
-        type: glob
-        value: "*.local."
+      - "tasks-infrastructure"
+      CloudWatchLogsResourcePolicy:
+      - "AWSLogDeliveryWrite20150319"
+      ECSTaskDefinition:
+      - type: glob
+        value: "arn:aws:ecs:*:*:task-definition/copilot-nuke:*"
+      S3Bucket:
+      - type: glob
+        value: "*terraform*"
+      - type: glob
+        value: "*athena*"
+      CloudWatchEventsTarget:
+      - "aws-controltower-ConfigComplianceChangeEventRule"
+      IAMUserAccessKey:
+      - type: glob
+        value: "tmp -> *"
+      IAMRole:
+      - "ECSTaskFullAccountAdmin"
+      - "OrganizationAccountAccessRole"
+      - type: glob
+        value: "AWSReservedSSO_AWSOrganizationsFullAccess_*"
+      - "AWSServiceRoleForOrganizations"
+      - "ecsTaskExecutionRole"
+      - type: glob
+        value: "task-nuke-*"
+      - type: glob
+        value: "cdn-*"
+      - type: glob
+        value: "AWSReservedSSO_*"
+      - type: glob
+        value: "aws-controltower-*"
+      IAMRolePolicyAttachment:
+      - type: glob
+        value: "task-nuke-*"
+      - type: glob
+        value: "OrganizationAccountAccessRole -> *"
+      - type: glob
+        value: "ecsTaskExecutionRole -> *"
+      - type: glob
+        value: "AWSReservedSSO_AWSReadOnlyAccess_* -> *"
+      - type: glob
+        value: "AWSReservedSSO_AWSPowerUserAccess_* -> *"
+      - type: glob
+        value: "AWSReservedSSO_AWSOrganizationsFullAccess_* -> *"
+      - type: glob
+        value: "AWSReservedSSO_AWSAdministratorAccess_* -> *"
+      - type: glob
+        value: "AWSReservedSSO_AdministratorAccess_* -> *"
+      - type: glob
+        value: "aws-controltower-* -> *"
+      - type: glob
+        value: "ECSTaskFullAccountAdmin -> *"
+      IAMRolePolicy:
+      - type: glob
+        value: "task-nuke-* -> *"
+      - type: glob
+        value: "OrganizationAccountAccessRole -> *"
+      - type: glob
+        value: "cdn-* -> *"
+      IAMUserPolicyAttachment:
+      - type: glob
+        value: "tmp -> *"
+      IAMUser:
+      - "tmp"
+      SSMParameter:
+      - type: glob
+        value: "/copilot/*"
+      SNSTopic:
+      - type: glob
+        value: "*:aws-controltower-*"
